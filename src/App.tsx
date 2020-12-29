@@ -1,4 +1,4 @@
-import { remove, set } from "immutable";
+import { set } from "immutable";
 import React from "react";
 import { Circle, Layer, Line, Rect, Stage } from "react-konva";
 import convexHull from "./convexHull";
