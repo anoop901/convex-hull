@@ -24,10 +24,6 @@ function App() {
     setPoints(set(points, index, point));
   }
 
-  function removePoint(index: number) {
-    setPoints(remove(points, index));
-  }
-
   const convexHullPoints = convexHull(points);
 
   return (
