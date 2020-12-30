@@ -5,16 +5,25 @@ import {
   enumerate,
   filter,
   findFirstMatching,
+  fold,
   iterate,
-  minBy,
-  reduce,
+  min,
 } from "./util/iterables";
-import { isOrientationClockwise } from "./util/geometry";
+import { crossProduct, vectorFromPoints } from "./util/Vector";
+import { distanceSq } from "./util/geometry";
+import { compareByNumber, compareInOrder } from "./util/comparators";
 
 export default function convexHull(points: Point[]): Point[] {
   const { index: leftmostPointIndex, value: leftmostPoint } = chain(points)
     .then(enumerate)
-    .then(minBy(({ value: { x } }) => x))
+    .then(
+      min(
+        compareInOrder(
+          compareByNumber(({ value: { x } }) => x),
+          compareByNumber(({ value: { y } }) => y)
+        )
+      )
+    )
     .end();
 
   return chain(
@@ -25,7 +34,9 @@ export default function convexHull(points: Point[]): Point[] {
         currentPoint: leftmostPoint,
       },
       ({ result, currentPointIndex, currentPoint }) => {
-        const { index: nextPointIndex, value: nextPoint } = chain(points)
+        const { bestPointSoFarIndex, bestPointSoFar, collinearPoints } = chain(
+          points
+        )
           .then(enumerate)
           .then(
             filter(
@@ -34,21 +45,68 @@ export default function convexHull(points: Point[]): Point[] {
             )
           )
           .then(
-            reduce(
+            fold(
+              {
+                bestPointSoFarIndex: null as number | null,
+                bestPointSoFar: null as Point | null,
+                collinearPoints: [] as Point[],
+              },
               (
-                { index: bestPointSoFarIndex, value: bestPointSoFar },
+                { bestPointSoFarIndex, bestPointSoFar, collinearPoints },
                 { index: otherPointIndex, value: otherPoint }
-              ) =>
-                isOrientationClockwise(currentPoint, bestPointSoFar, otherPoint)
-                  ? { index: bestPointSoFarIndex, value: bestPointSoFar }
-                  : { index: otherPointIndex, value: otherPoint }
+              ) => {
+                if (bestPointSoFarIndex === null || bestPointSoFar === null) {
+                  return {
+                    bestPointSoFarIndex: otherPointIndex,
+                    bestPointSoFar: otherPoint,
+                    collinearPoints: collinearPoints,
+                  };
+                }
+                const cp = crossProduct(
+                  vectorFromPoints(currentPoint, bestPointSoFar),
+                  vectorFromPoints(currentPoint, otherPoint)
+                );
+                if (cp > 0) {
+                  return {
+                    bestPointSoFarIndex: otherPointIndex,
+                    bestPointSoFar: otherPoint,
+                    collinearPoints: [],
+                  };
+                } else if (cp === 0) {
+                  if (
+                    distanceSq(currentPoint, otherPoint) >
+                    distanceSq(currentPoint, bestPointSoFar)
+                  ) {
+                    return {
+                      bestPointSoFarIndex: otherPointIndex,
+                      bestPointSoFar: otherPoint,
+                      collinearPoints: [...collinearPoints, bestPointSoFar],
+                    };
+                  } else {
+                    return {
+                      bestPointSoFarIndex,
+                      bestPointSoFar,
+                      collinearPoints: [...collinearPoints, otherPoint],
+                    };
+                  }
+                } else {
+                  return {
+                    bestPointSoFarIndex,
+                    bestPointSoFar,
+                    collinearPoints,
+                  };
+                }
+              }
             )
           )
           .end();
+        if (bestPointSoFarIndex === null || bestPointSoFar === null) {
+          throw new Error("unimplemented");
+        }
         return {
-          currentPointIndex: nextPointIndex,
-          currentPoint: nextPoint,
-          result: [...result, currentPoint],
+          currentPointIndex: bestPointSoFarIndex,
+          currentPoint: bestPointSoFar,
+          result: [...result, currentPoint, ...collinearPoints],
         };
       }
     )

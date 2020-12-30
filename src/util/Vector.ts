@@ -12,3 +12,7 @@ export function vectorFromPoints(fromPoint: Point, toPoint: Point) {
 export function crossProduct(vector1: Vector, vector2: Vector): number {
   return vector1.x * vector2.y - vector1.y * vector2.x;
 }
+
+export function magnitudeSq(vector: Vector) {
+  return vector.x * vector.x + vector.y * vector.y;
+}

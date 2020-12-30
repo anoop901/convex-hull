@@ -62,8 +62,18 @@ export function reduce<T>(fn: (a: T, b: T) => T) {
   };
 }
 
+export function min<T>(
+  comparator: (a: T, b: T) => number
+): (iterable: Iterable<T>) => T {
+  return reduce<T>((a, b) => (comparator(b, a) < 0 ? b : a));
+}
+
 export function minBy<T, U>(fn: (arg: T) => U): (iterable: Iterable<T>) => T {
   return reduce<T>((a, b) => (fn(b) < fn(a) ? b : a));
+}
+
+export function maxBy<T, U>(fn: (arg: T) => U): (iterable: Iterable<T>) => T {
+  return reduce<T>((a, b) => (fn(b) > fn(a) ? b : a));
 }
 
 export function enumerate<T>(
