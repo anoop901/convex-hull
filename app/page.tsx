@@ -1,5 +1,5 @@
 "use client";
-import Point from "@/util/Point";
+import Point from "@/model/Point";
 import dynamic from "next/dynamic";
 import { useState } from "react";
 import { set } from "immutable";
