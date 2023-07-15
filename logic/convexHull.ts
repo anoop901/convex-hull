@@ -1,5 +1,5 @@
-import Point from "./util/Point";
-import chain from "./util/chain";
+import Point from "../model/Point";
+import chain from "../util/chain";
 import {
   drop,
   enumerate,
@@ -8,10 +8,10 @@ import {
   fold,
   iterate,
   min,
-} from "./util/iterables";
-import { crossProduct, vectorFromPoints } from "./util/Vector";
-import { distanceSq } from "./util/geometry";
-import { compareByNumber, compareInOrder } from "./util/comparators";
+} from "../util/iterables";
+import { crossProduct, vectorFromPoints } from "../model/Vector";
+import { distanceSq } from "./geometry";
+import { compareByNumber, compareInOrder } from "../util/comparators";
 
 export default function convexHull(points: Point[]): Point[] {
   const { index: leftmostPointIndex, value: leftmostPoint } = chain(points)

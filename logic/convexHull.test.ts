@@ -1,5 +1,5 @@
 import convexHull from "./convexHull";
-import Point from "./util/Point";
+import Point from "../model/Point";
 
 describe("convexHull", () => {
   test("basic", () => {

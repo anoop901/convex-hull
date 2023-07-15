@@ -1,15 +1,19 @@
+"use client";
+import Point from "@/util/Point";
+import dynamic from "next/dynamic";
+import { useState } from "react";
 import { set } from "immutable";
 import React from "react";
-import { Circle, Layer, Line, Rect, Stage } from "react-konva";
-import convexHull from "./convexHull";
-import Point from "./util/Point";
+
+const Canvas = dynamic(() => import("@/components/Canvas"), {
+  ssr: false,
+});
 
 const width = 500;
 const height = 500;
-const radius = 10;
 
-function App() {
-  const [points, setPoints] = React.useState<Point[]>([
+export default function Home() {
+  const [points, setPoints] = useState<Point[]>([
     { x: 100, y: 100 },
     { x: 100, y: 200 },
     { x: 200, y: 200 },
@@ -24,70 +28,17 @@ function App() {
     setPoints(set(points, index, point));
   }
 
-  const convexHullPoints = convexHull(points);
-
   return (
     <div>
       <div>
         <p>Double-click to add a point.</p>
-        <Stage
+        <Canvas
           width={width}
           height={height}
-          onDblClick={(event) => {
-            const pointerPosition = event.target
-              .getStage()
-              ?.getPointerPosition();
-            if (!pointerPosition) {
-              return;
-            }
-            addPoint({ x: pointerPosition.x, y: pointerPosition.y });
-          }}
-        >
-          <Layer>
-            <Rect
-              x={0}
-              y={0}
-              width={width}
-              height={height}
-              stroke={"black"}
-            ></Rect>
-          </Layer>
-          <Layer>
-            <Line
-              points={convexHullPoints.flatMap(({ x, y }) => [x, y])}
-              stroke="orange"
-              lineJoin="round"
-              lineCap="round"
-              hitStrokeWidth={0}
-              closed
-            />
-            {convexHullPoints.map(({ x, y }, index) => (
-              <Circle
-                key={index}
-                x={x}
-                y={y}
-                radius={radius * 1.5}
-                fill="orange"
-              />
-            ))}
-          </Layer>
-          <Layer>
-            {points.map((point, index) => (
-              <Circle
-                draggable
-                key={index}
-                x={point.x}
-                y={point.y}
-                radius={radius}
-                fill="green"
-                stroke="darkgreen"
-                onDragMove={(event) => {
-                  setPoint(index, { x: event.target.x(), y: event.target.y() });
-                }}
-              />
-            ))}
-          </Layer>
-        </Stage>
+          points={points}
+          addPoint={addPoint}
+          setPoint={setPoint}
+        />
       </div>
 
       <h1>Points</h1>
@@ -149,5 +100,3 @@ function App() {
     </div>
   );
 }
-
-export default App;

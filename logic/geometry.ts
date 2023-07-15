@@ -1,5 +1,5 @@
-import Point from "./Point";
-import { crossProduct, magnitudeSq, vectorFromPoints } from "./Vector";
+import Point from "../model/Point";
+import { crossProduct, magnitudeSq, vectorFromPoints } from "../model/Vector";
 
 export function distanceSq(point1: Point, point2: Point): number {
   return magnitudeSq(vectorFromPoints(point1, point2));
