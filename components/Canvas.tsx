@@ -1,5 +1,5 @@
 import convexHull from "@/logic/convexHull";
-import Point from "@/util/Point";
+import Point from "@/model/Point";
 import { Stage, Circle, Layer, Line, Rect } from "react-konva";
 
 const radius = 10;
