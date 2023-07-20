@@ -20,6 +20,7 @@ export default function Canvas({
   const convexHullPoints = convexHull(points);
   return (
     <Stage
+      className="max-w-full"
       width={width}
       height={height}
       onDblClick={(event) => {
